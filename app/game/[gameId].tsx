@@ -69,16 +69,22 @@ export default function GameScreen() {
                 </View>
               </View>
               <Text style={styles.playerName}>{opponent.name} ({opponent.chips})</Text>
+              {opponent.isFolded && <Text style={styles.playerStatus}>Folded</Text>}
+              <Text style={styles.playerBet}>Bet: {opponent.bet}</Text>
             </View>
           ))}
 
-          {/* Center Area with Logo and Pot */}
+          {/* Center Area with Community Cards and Pot */}
           <View style={styles.centerArea}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logoIcon}>🃏</Text>
-              <Text style={styles.logoText}>EasyPoker</Text>
+            <View style={styles.communityCardsContainer}>
+              {gameState.communityCards.map((card: any, index: number) => (
+                <View style={styles.card} key={index}>
+                  <Text style={styles.cardValue}>{card.rank}</Text>
+                  <Text style={styles.cardSuit}>{card.suit}</Text>
+                </View>
+              ))}
             </View>
-            <Text style={styles.potAmount}>{gameState.pot}</Text>
+            <Text style={styles.potAmount}>Pot: {gameState.pot}</Text>
           </View>
 
           {/* Player Cards */}
@@ -193,9 +199,22 @@ const styles = StyleSheet.create({
     fontSize: scale(24),
     fontWeight: 'bold',
   },
+  playerStatus: {
+    color: '#ff0000',
+    fontSize: scale(14),
+  },
+  playerBet: {
+    color: '#fff',
+    fontSize: scale(14),
+  },
   centerArea: {
     alignItems: 'center',
     marginBottom: verticalScale(60),
+  },
+  communityCardsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: scale(20),
   },
   logoContainer: {
     alignItems: 'center',

@@ -1,21 +1,28 @@
 import { HoldemEngine } from 'holdem-engine';
 
-// Create a new game engine
 const engine = new HoldemEngine();
 
-// Add players
 engine.addPlayer({ id: 'player', name: 'Player', chips: 500 });
 engine.addPlayer({ id: 'bot1', name: 'Bot 1', chips: 500 });
 engine.addPlayer({ id: 'bot2', name: 'Bot 2', chips: 500 });
 
-// Start the game
 engine.start();
 
-const takeBotAction = (player: any) => {
+const takeBotAction = (player) => {
   if (player.id.startsWith('bot')) {
     setTimeout(() => {
       try {
-        engine.call(player.id);
+        const amountToCall = engine.getAmountToCall(player.id);
+        const canRaise = engine.canRaise(player.id);
+
+        if (amountToCall === 0) {
+          engine.check(player.id);
+        } else if (canRaise && Math.random() < 0.3) {
+          const raiseAmount = Math.floor(Math.random() * player.chips);
+          engine.raise(player.id, raiseAmount);
+        } else {
+          engine.call(player.id);
+        }
       } catch (e) {
         engine.fold(player.id);
       }
@@ -23,7 +30,7 @@ const takeBotAction = (player: any) => {
   }
 };
 
-engine.on('stateChanged', (state: any) => {
+engine.on('stateChanged', (state) => {
   if (state.activePlayer) {
     takeBotAction(state.activePlayer);
   }
