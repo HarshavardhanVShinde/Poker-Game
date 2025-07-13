@@ -41,6 +41,7 @@ export default function AuthLanding() {
             <TouchableOpacity style={styles.signUpButton} onPress={() => router.push('/(auth)/signup')}>
               <MaterialCommunityIcons name="email" size={scale(20)} color="#00e6c3" style={styles.buttonIcon} />
               <Text style={styles.signUpButtonText}>Email Sign Up</Text>
+              
             </TouchableOpacity>
             <TouchableOpacity style={styles.loginLink} onPress={() => router.push('/(auth)/login')}>
               <Text style={styles.loginLinkText}>Login with Email</Text>
