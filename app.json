@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "scheme": "acme",
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "name": "PokerPlay",
+    "slug": "PokerPlay"
+  }
+}
