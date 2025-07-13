@@ -1,287 +1,231 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Text, useTheme, Card } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
-import { Button } from '../../src/components/ui/Button';
-import { joinGame } from '../../src/store/gameSlice';
-import { AppDispatch } from '../../src/store';
-import { MenuDrawer } from '../../src/components/layout/MenuDrawer';
+import { View, StyleSheet, Dimensions, TouchableOpacity, StatusBar, SafeAreaView, Modal } from 'react-native';
+import { Text } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
 
-// Mock data for available games
-const mockGames = [
-  {
-    id: '1',
-    name: 'Hold\'em Table #1',
-    variant: 'Hold\'em',
-    players: 3,
-    maxPlayers: 6,
-    minBet: 10,
-    status: 'waiting',
-  },
-  {
-    id: '2',
-    name: 'Omaha High',
-    variant: 'Omaha',
-    players: 5,
-    maxPlayers: 6,
-    minBet: 25,
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: 'Short Deck',
-    variant: 'Short Deck',
-    players: 2,
-    maxPlayers: 6,
-    minBet: 5,
-    status: 'waiting',
-  },
-];
+const { width, height } = Dimensions.get('window');
+
+// Responsive scaling
+const scale = (size: number) => (width / 375) * size;
+const verticalScale = (size: number) => (height / 812) * size;
 
 export default function FindGameScreen() {
-  const theme = useTheme();
-  const dispatch = useDispatch<AppDispatch>();
-  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [pin, setPin] = useState('');
 
-  const handleJoinGame = async (gameId: string) => {
-    const result = await dispatch(joinGame(gameId));
-    if (joinGame.fulfilled.match(result)) {
-      // Navigate to game screen
-      // router.push(`/game/${gameId}`);
+  const handleNumberPress = (number: string) => {
+    if (pin.length < 6) {
+      setPin(pin + number);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'waiting':
-        return theme.colors.secondary;
-      case 'active':
-        return theme.colors.primary;
-      default:
-        return theme.colors.onSurfaceVariant;
+  const handleBackspace = () => {
+    setPin(pin.slice(0, -1));
+  };
+
+  const handleGo = () => {
+    if (pin.length > 0) {
+      // Navigate to game with PIN
+      setShowPinModal(false);
+      setPin('');
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'waiting':
-        return 'Waiting';
-      case 'active':
-        return 'Active';
-      default:
-        return status;
-    }
+  const handleClose = () => {
+    setShowPinModal(false);
+    setPin('');
+  };
+
+  const renderNumberPad = () => {
+    const numbers = [
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['7', '8', '9'],
+      ['⌫', '0', 'GO']
+    ];
+
+    return (
+      <View style={styles.numberPad}>
+        {numbers.map((row, rowIndex) => (
+          <View key={rowIndex} style={styles.numberRow}>
+            {row.map((item, itemIndex) => (
+              <TouchableOpacity
+                key={itemIndex}
+                style={[
+                  styles.numberButton,
+                  item === 'GO' && styles.goButton,
+                  item === '⌫' && styles.backspaceButton
+                ]}
+                onPress={() => {
+                  if (item === '⌫') handleBackspace();
+                  else if (item === 'GO') handleGo();
+                  else handleNumberPress(item);
+                }}
+              >
+                <Text style={[
+                  styles.numberText,
+                  item === 'GO' && styles.goButtonText
+                ]}>
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
+      </View>
+    );
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
-        <Text style={[styles.title, { color: theme.colors.onSurface }]}>
-          Find Game
-        </Text>
-        <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
-          Join an existing table
-        </Text>
-      </View>
-
-      {/* Filters */}
-      <View style={styles.filtersContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
-            style={[
-              styles.filterButton,
-              { backgroundColor: theme.colors.surfaceVariant },
-              selectedFilter === 'all' && { backgroundColor: theme.colors.primary }
-            ]}
-            onPress={() => setSelectedFilter('all')}
-          >
-            <Text style={[
-              styles.filterText,
-              { color: selectedFilter === 'all' ? theme.colors.onPrimary : theme.colors.onSurfaceVariant }
-            ]}>
-              All Games
-            </Text>
-          </TouchableOpacity>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="#F5F5F5" />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.content}>
+          <Text style={styles.title}>Find Game</Text>
           
-          <TouchableOpacity
-            style={[
-              styles.filterButton,
-              { backgroundColor: theme.colors.surfaceVariant },
-              selectedFilter === 'waiting' && { backgroundColor: theme.colors.secondary }
-            ]}
-            onPress={() => setSelectedFilter('waiting')}
+          <TouchableOpacity 
+            style={styles.joinButton}
+            onPress={() => setShowPinModal(true)}
           >
-            <Text style={[
-              styles.filterText,
-              { color: selectedFilter === 'waiting' ? theme.colors.onSecondary : theme.colors.onSurfaceVariant }
-            ]}>
-              Waiting
-            </Text>
+            <Text style={styles.joinButtonText}>Enter Game PIN</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[
-              styles.filterButton,
-              { backgroundColor: theme.colors.surfaceVariant },
-              selectedFilter === 'active' && { backgroundColor: theme.colors.primary }
-            ]}
-            onPress={() => setSelectedFilter('active')}
-          >
-            <Text style={[
-              styles.filterText,
-              { color: selectedFilter === 'active' ? theme.colors.onPrimary : theme.colors.onSurfaceVariant }
-            ]}>
-              Active
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
+        </View>
 
-      {/* Games List */}
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        {mockGames.map((game) => (
-          <Card
-            key={game.id}
-            style={[styles.gameCard, { backgroundColor: theme.colors.surface }]}
-            mode="outlined"
-          >
-            <Card.Content>
-              <View style={styles.gameHeader}>
-                <View style={styles.gameInfo}>
-                  <Text style={[styles.gameName, { color: theme.colors.onSurface }]}>
-                    {game.name}
-                  </Text>
-                  <Text style={[styles.gameVariant, { color: theme.colors.onSurfaceVariant }]}>
-                    {game.variant}
-                  </Text>
+        {/* PIN Entry Modal */}
+        <Modal
+          visible={showPinModal}
+          transparent
+          animationType="fade"
+          onRequestClose={handleClose}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+                <Ionicons name="close" size={scale(24)} color="#999" />
+              </TouchableOpacity>
+              
+              <View style={styles.pinContainer}>
+                <View style={styles.pinDisplay}>
+                  <Text style={styles.pinText}>{pin}</Text>
+                  <View style={styles.pinCursor} />
                 </View>
-                <View style={styles.gameStatus}>
-                  <Text style={[styles.statusText, { color: getStatusColor(game.status) }]}>
-                    {getStatusText(game.status)}
-                  </Text>
-                </View>
+                <Text style={styles.pinLabel}>Enter Game PIN</Text>
               </View>
 
-              <View style={styles.gameDetails}>
-                <View style={styles.detailItem}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.onSurfaceVariant }]}>
-                    Players
-                  </Text>
-                  <Text style={[styles.detailValue, { color: theme.colors.onSurface }]}>
-                    {game.players}/{game.maxPlayers}
-                  </Text>
-                </View>
-                
-                <View style={styles.detailItem}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.onSurfaceVariant }]}>
-                    Min Bet
-                  </Text>
-                  <Text style={[styles.detailValue, { color: theme.colors.onSurface }]}>
-                    ${game.minBet}
-                  </Text>
-                </View>
-              </View>
-
-              <Button
-                title="Join Game"
-                onPress={() => handleJoinGame(game.id)}
-                variant="primary"
-                size="small"
-                style={styles.joinButton}
-                disabled={game.status === 'active' && game.players >= game.maxPlayers}
-              />
-            </Card.Content>
-          </Card>
-        ))}
-      </ScrollView>
-      <MenuDrawer />
-    </View>
+              {renderNumberPad()}
+            </View>
+          </View>
+        </Modal>
+      </SafeAreaView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-  },
-  filtersContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  filterButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 12,
-  },
-  filterText: {
-    fontSize: 14,
-    fontWeight: '600',
+    backgroundColor: '#F5F5F5',
   },
   content: {
     flex: 1,
-  },
-  contentContainer: {
-    padding: 20,
-  },
-  gameCard: {
-    marginBottom: 16,
-  },
-  gameHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  gameInfo: {
-    flex: 1,
-  },
-  gameName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  gameVariant: {
-    fontSize: 14,
-  },
-  gameStatus: {
-    alignItems: 'flex-end',
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  gameDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  detailItem: {
+    justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: scale(20),
   },
-  detailLabel: {
-    fontSize: 12,
-    marginBottom: 2,
-  },
-  detailValue: {
-    fontSize: 14,
-    fontWeight: '600',
+  title: {
+    fontSize: scale(24),
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: verticalScale(40),
   },
   joinButton: {
-    alignSelf: 'flex-end',
+    backgroundColor: '#00E6C3',
+    paddingHorizontal: scale(40),
+    paddingVertical: verticalScale(16),
+    borderRadius: scale(25),
   },
-}); 
+  joinButtonText: {
+    color: '#fff',
+    fontSize: scale(18),
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#F5F5F5',
+    width: width * 0.9,
+    maxWidth: scale(400),
+    borderRadius: scale(20),
+    paddingVertical: verticalScale(40),
+    paddingHorizontal: scale(20),
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: scale(20),
+    left: scale(20),
+    padding: scale(8),
+  },
+  pinContainer: {
+    alignItems: 'center',
+    marginBottom: verticalScale(40),
+    marginTop: verticalScale(20),
+  },
+  pinDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: scale(20),
+    minHeight: scale(40),
+  },
+  pinText: {
+    fontSize: scale(32),
+    fontWeight: 'bold',
+    color: '#333',
+    letterSpacing: scale(4),
+  },
+  pinCursor: {
+    width: scale(2),
+    height: scale(32),
+    backgroundColor: '#999',
+    marginLeft: scale(4),
+  },
+  pinLabel: {
+    fontSize: scale(16),
+    color: '#999',
+  },
+  numberPad: {
+    width: '100%',
+  },
+  numberRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: scale(20),
+  },
+  numberButton: {
+    width: scale(80),
+    height: scale(80),
+    borderRadius: scale(40),
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backspaceButton: {
+    backgroundColor: 'transparent',
+  },
+  goButton: {
+    backgroundColor: '#00E6C3',
+  },
+  numberText: {
+    fontSize: scale(24),
+    fontWeight: 'bold',
+    color: '#999',
+  },
+  goButtonText: {
+    color: '#fff',
+    fontSize: scale(18),
+  },
+});

@@ -1,331 +1,225 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Text, useTheme, Card, Avatar, Divider } from 'react-native-paper';
-import { useDispatch, useSelector } from 'react-redux';
-import { Button } from '../../src/components/ui/Button';
-import { logoutUser } from '../../src/store/authSlice';
-import { RootState, AppDispatch } from '../../src/store';
-import { formatChipAmount } from '../../src/utils/helpers';
-import { MenuDrawer } from '../../src/components/layout/MenuDrawer';
+import { View, StyleSheet, Dimensions, StatusBar, SafeAreaView, ScrollView } from 'react-native';
+import { Text } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
+
+const { width, height } = Dimensions.get('window');
+
+// Responsive scaling
+const scale = (size: number) => (width / 375) * size;
+const verticalScale = (size: number) => (height / 812) * size;
 
 export default function ProfileScreen() {
-  const theme = useTheme();
-  const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
-
-  const handleLogout = async () => {
-    await dispatch(logoutUser());
-    // Navigation will be handled by auth state change
-  };
-
-  const handleEditProfile = () => {
-    // TODO: Navigate to edit profile screen
-  };
-
-  const handleSettings = () => {
-    // TODO: Navigate to settings screen
-  };
-
-  const handleHelp = () => {
-    // TODO: Navigate to help screen
-  };
-
-  if (!user) {
-    return (
-      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <Text style={[styles.errorText, { color: theme.colors.error }]}>
-          User not found
-        </Text>
-      </View>
-    );
-  }
-
-  const winRate = user.totalGames > 0 ? Math.round((user.gamesWon / user.totalGames) * 100) : 0;
-
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
-        <Text style={[styles.title, { color: theme.colors.onSurface }]}>
-          Profile
-        </Text>
-      </View>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="#F5F5F5" />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Ionicons name="arrow-back" size={scale(24)} color="#999" />
+          <Text style={styles.title}>Profile</Text>
+          <Ionicons name="menu" size={scale(24)} color="#999" />
+        </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        {/* User Info Card */}
-        <Card style={[styles.userCard, { backgroundColor: theme.colors.surface }]} mode="outlined">
-          <Card.Content>
-            <View style={styles.userInfo}>
-              <View style={styles.avatarContainer}>
-                <Text style={styles.avatarText}>
-                  {user.avatar || '👤'}
-                </Text>
-              </View>
-              
-              <View style={styles.userDetails}>
-                <Text style={[styles.username, { color: theme.colors.onSurface }]}>
-                  {user.username}
-                </Text>
-                {user.email && (
-                  <Text style={[styles.email, { color: theme.colors.onSurfaceVariant }]}>
-                    {user.email}
-                  </Text>
-                )}
-                {user.bio && (
-                  <Text style={[styles.bio, { color: theme.colors.onSurfaceVariant }]}>
-                    {user.bio}
-                  </Text>
-                )}
-                {user.isGuest && (
-                  <Text style={[styles.guestBadge, { color: theme.colors.secondary }]}>
-                    Guest User
-                  </Text>
-                )}
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Profile Avatar and Info */}
+          <View style={styles.profileSection}>
+            <View style={styles.avatarContainer}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>👤</Text>
               </View>
             </View>
-
-            <View style={styles.chipBalance}>
-              <Text style={[styles.balanceLabel, { color: theme.colors.onSurfaceVariant }]}>
-                Chip Balance
-              </Text>
-              <Text style={[styles.balanceValue, { color: theme.colors.primary }]}>
-                ${formatChipAmount(user.chipBalance)}
-              </Text>
-            </View>
-          </Card.Content>
-        </Card>
-
-        {/* Game Statistics */}
-        <Card style={[styles.statsCard, { backgroundColor: theme.colors.surface }]} mode="outlined">
-          <Card.Content>
-            <Text style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
-              Game Statistics
-            </Text>
             
+            <Text style={styles.username}>PokerFace</Text>
+            <Text style={styles.level}>lvl. 4</Text>
+            
+            {/* Progress Bar */}
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBar}>
+                <View style={styles.progressFill} />
+              </View>
+            </View>
+            
+            <Text style={styles.experience}>2021 / 4000XP</Text>
+          </View>
+
+          {/* Stats Section */}
+          <View style={styles.statsSection}>
+            <View style={styles.statsHeader}>
+              <Text style={styles.statsTitle}>My Stats</Text>
+              <View style={styles.dropdown}>
+                <Text style={styles.dropdownText}>Weekly</Text>
+                <Ionicons name="chevron-down" size={scale(16)} color="#999" />
+              </View>
+            </View>
+
             <View style={styles.statsGrid}>
               <View style={styles.statItem}>
-                <Text style={[styles.statValue, { color: theme.colors.primary }]}>
-                  {user.totalGames}
-                </Text>
-                <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
-                  Games Played
-                </Text>
+                <View style={styles.statIcon}>
+                  <Ionicons name="hand-left-outline" size={scale(24)} color="#999" />
+                </View>
+                <Text style={styles.statValue}>0</Text>
+                <Text style={styles.statLabel}>Hands Dealt</Text>
               </View>
               
               <View style={styles.statItem}>
-                <Text style={[styles.statValue, { color: theme.colors.secondary }]}>
-                  {user.gamesWon}
-                </Text>
-                <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
-                  Games Won
-                </Text>
-              </View>
-              
-              <View style={styles.statItem}>
-                <Text style={[styles.statValue, { color: theme.colors.error }]}>
-                  {user.gamesLost}
-                </Text>
-                <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
-                  Games Lost
-                </Text>
-              </View>
-              
-              <View style={styles.statItem}>
-                <Text style={[styles.statValue, { color: theme.colors.tertiary }]}>
-                  {winRate}%
-                </Text>
-                <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
-                  Win Rate
-                </Text>
+                <View style={styles.statIcon}>
+                  <Ionicons name="play-outline" size={scale(24)} color="#999" />
+                </View>
+                <Text style={styles.statValue}>0</Text>
+                <Text style={styles.statLabel}>Hands Played</Text>
               </View>
             </View>
-          </Card.Content>
-        </Card>
+          </View>
+        </ScrollView>
 
-        {/* Actions */}
-        <Card style={[styles.actionsCard, { backgroundColor: theme.colors.surface }]} mode="outlined">
-          <Card.Content>
-            <Text style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
-              Actions
-            </Text>
-            
-            <TouchableOpacity
-              style={styles.actionItem}
-              onPress={handleEditProfile}
-            >
-              <Text style={[styles.actionText, { color: theme.colors.onSurface }]}>
-                Edit Profile
-              </Text>
-              <Text style={[styles.actionArrow, { color: theme.colors.onSurfaceVariant }]}>
-                →
-              </Text>
-            </TouchableOpacity>
-            
-            <Divider style={styles.divider} />
-            
-            <TouchableOpacity
-              style={styles.actionItem}
-              onPress={handleSettings}
-            >
-              <Text style={[styles.actionText, { color: theme.colors.onSurface }]}>
-                Settings
-              </Text>
-              <Text style={[styles.actionArrow, { color: theme.colors.onSurfaceVariant }]}>
-                →
-              </Text>
-            </TouchableOpacity>
-            
-            <Divider style={styles.divider} />
-            
-            <TouchableOpacity
-              style={styles.actionItem}
-              onPress={handleHelp}
-            >
-              <Text style={[styles.actionText, { color: theme.colors.onSurface }]}>
-                Help & Support
-              </Text>
-              <Text style={[styles.actionArrow, { color: theme.colors.onSurfaceVariant }]}>
-                →
-              </Text>
-            </TouchableOpacity>
-          </Card.Content>
-        </Card>
-
-        {/* Logout Button */}
-        <Button
-          title="Logout"
-          onPress={handleLogout}
-          variant="danger"
-          style={styles.logoutButton}
-        />
-      </ScrollView>
-      <MenuDrawer />
-    </View>
+        {/* Bottom Navigation Indicator */}
+        <View style={styles.bottomNav}>
+          <View style={styles.navIndicator} />
+        </View>
+      </SafeAreaView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F5F5F5',
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: scale(20),
+    paddingVertical: verticalScale(16),
   },
   title: {
-    fontSize: 24,
+    fontSize: scale(18),
     fontWeight: 'bold',
+    color: '#999',
   },
   content: {
     flex: 1,
   },
-  contentContainer: {
-    padding: 20,
-  },
-  userCard: {
-    marginBottom: 20,
-  },
-  userInfo: {
-    flexDirection: 'row',
+  profileSection: {
     alignItems: 'center',
-    marginBottom: 16,
+    paddingVertical: verticalScale(40),
+    paddingHorizontal: scale(20),
   },
   avatarContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#f0f0f0',
+    marginBottom: verticalScale(20),
+  },
+  avatar: {
+    width: scale(120),
+    height: scale(120),
+    borderRadius: scale(60),
+    backgroundColor: '#E0E0E0',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   avatarText: {
-    fontSize: 32,
-  },
-  userDetails: {
-    flex: 1,
+    fontSize: scale(60),
   },
   username: {
-    fontSize: 20,
+    fontSize: scale(24),
     fontWeight: 'bold',
-    marginBottom: 4,
+    color: '#999',
+    marginBottom: scale(8),
   },
-  email: {
-    fontSize: 14,
-    marginBottom: 4,
+  level: {
+    fontSize: scale(16),
+    color: '#999',
+    marginBottom: verticalScale(20),
   },
-  bio: {
-    fontSize: 14,
-    marginBottom: 4,
+  progressContainer: {
+    width: '80%',
+    marginBottom: scale(12),
   },
-  guestBadge: {
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
+  progressBar: {
+    height: scale(8),
+    backgroundColor: '#E0E0E0',
+    borderRadius: scale(4),
+    overflow: 'hidden',
   },
-  chipBalance: {
+  progressFill: {
+    height: '100%',
+    width: '50%',
+    backgroundColor: '#FFD700',
+    borderRadius: scale(4),
+  },
+  experience: {
+    fontSize: scale(14),
+    color: '#999',
+  },
+  statsSection: {
+    paddingHorizontal: scale(20),
+    paddingTop: verticalScale(20),
+  },
+  statsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: verticalScale(30),
   },
-  balanceLabel: {
-    fontSize: 12,
-    marginBottom: 4,
-  },
-  balanceValue: {
-    fontSize: 24,
+  statsTitle: {
+    fontSize: scale(20),
     fontWeight: 'bold',
+    color: '#999',
   },
-  statsCard: {
-    marginBottom: 20,
+  dropdown: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: scale(12),
+    paddingVertical: scale(6),
+    backgroundColor: '#E0E0E0',
+    borderRadius: scale(15),
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 16,
+  dropdownText: {
+    fontSize: scale(14),
+    color: '#999',
+    marginRight: scale(4),
   },
   statsGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
   },
   statItem: {
-    width: '48%',
     alignItems: 'center',
-    marginBottom: 16,
+    flex: 1,
+  },
+  statIcon: {
+    width: scale(50),
+    height: scale(50),
+    borderRadius: scale(25),
+    backgroundColor: '#E0E0E0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: scale(12),
   },
   statValue: {
-    fontSize: 24,
+    fontSize: scale(32),
     fontWeight: 'bold',
-    marginBottom: 4,
+    color: '#999',
+    marginBottom: scale(8),
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: scale(14),
+    color: '#999',
     textAlign: 'center',
   },
-  actionsCard: {
-    marginBottom: 20,
-  },
-  actionItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  bottomNav: {
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: verticalScale(10),
   },
-  actionText: {
-    fontSize: 16,
+  navIndicator: {
+    width: scale(40),
+    height: scale(4),
+    backgroundColor: '#00E6C3',
+    borderRadius: scale(2),
   },
-  actionArrow: {
-    fontSize: 16,
-  },
-  divider: {
-    marginVertical: 4,
-  },
-  logoutButton: {
-    marginTop: 20,
-  },
-  errorText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 100,
-  },
-}); 
+});

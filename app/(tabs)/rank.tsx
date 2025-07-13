@@ -1,295 +1,280 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Text, useTheme, Card, Avatar } from 'react-native-paper';
-import { MenuDrawer } from '../../src/components/layout/MenuDrawer';
+import React from 'react';
+import { View, StyleSheet, Dimensions, StatusBar, SafeAreaView, ScrollView } from 'react-native';
+import { Text } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
 
-// Mock leaderboard data
-const mockLeaderboard = [
-  {
-    id: '1',
-    username: 'PokerKing',
-    rank: 1,
-    gamesWon: 156,
-    gamesPlayed: 200,
-    winRate: 78,
-    chipBalance: 25000,
-    avatar: '👑',
-  },
-  {
-    id: '2',
-    username: 'AcePlayer',
-    rank: 2,
-    gamesWon: 142,
-    gamesPlayed: 180,
-    winRate: 79,
-    chipBalance: 22000,
-    avatar: '🃏',
-  },
-  {
-    id: '3',
-    username: 'RoyalFlush',
-    rank: 3,
-    gamesWon: 128,
-    gamesPlayed: 165,
-    winRate: 78,
-    chipBalance: 19500,
-    avatar: '♠️',
-  },
-  {
-    id: '4',
-    username: 'LuckyDiamond',
-    rank: 4,
-    gamesWon: 115,
-    gamesPlayed: 150,
-    winRate: 77,
-    chipBalance: 18000,
-    avatar: '♦️',
-  },
-  {
-    id: '5',
-    username: 'HeartBreaker',
-    rank: 5,
-    gamesWon: 98,
-    gamesPlayed: 135,
-    winRate: 73,
-    chipBalance: 16500,
-    avatar: '♥️',
-  },
+const { width, height } = Dimensions.get('window');
+
+// Responsive scaling
+const scale = (size: number) => (width / 375) * size;
+const verticalScale = (size: number) => (height / 812) * size;
+
+const leaderboardData = [
+  { id: 1, name: 'DVNCAD', score: 1994, change: '+267500', avatar: '🏆', position: 1 },
+  { id: 2, name: 'jennieace', score: 936, change: '+128045', avatar: '👤', position: 2 },
+  { id: 3, name: 'alexnuggett', score: 444, change: '+100170', avatar: '👤', position: 3 },
 ];
 
 export default function RankScreen() {
-  const theme = useTheme();
-  const [selectedPeriod, setSelectedPeriod] = useState('all');
-
-  const getRankColor = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return '#FFD700'; // Gold
-      case 2:
-        return '#C0C0C0'; // Silver
-      case 3:
-        return '#CD7F32'; // Bronze
-      default:
-        return theme.colors.onSurfaceVariant;
-    }
-  };
-
-  const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return '🥇';
-      case 2:
-        return '🥈';
-      case 3:
-        return '🥉';
-      default:
-        return `#${rank}`;
-    }
-  };
-
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
-        <Text style={[styles.title, { color: theme.colors.onSurface }]}>
-          Leaderboard
-        </Text>
-        <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
-          Top players this week
-        </Text>
-      </View>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="#F5F5F5" />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Ionicons name="information-circle-outline" size={scale(24)} color="#999" />
+          <Text style={styles.title}>Rank</Text>
+          <Ionicons name="menu" size={scale(24)} color="#999" />
+        </View>
 
-      {/* Period Filters */}
-      <View style={styles.filtersContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
-            style={[
-              styles.filterButton,
-              { backgroundColor: theme.colors.surfaceVariant },
-              selectedPeriod === 'all' && { backgroundColor: theme.colors.primary }
-            ]}
-            onPress={() => setSelectedPeriod('all')}
-          >
-            <Text style={[
-              styles.filterText,
-              { color: selectedPeriod === 'all' ? theme.colors.onPrimary : theme.colors.onSurfaceVariant }
-            ]}>
-              All Time
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[
-              styles.filterButton,
-              { backgroundColor: theme.colors.surfaceVariant },
-              selectedPeriod === 'week' && { backgroundColor: theme.colors.primary }
-            ]}
-            onPress={() => setSelectedPeriod('week')}
-          >
-            <Text style={[
-              styles.filterText,
-              { color: selectedPeriod === 'week' ? theme.colors.onPrimary : theme.colors.onSurfaceVariant }
-            ]}>
-              This Week
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[
-              styles.filterButton,
-              { backgroundColor: theme.colors.surfaceVariant },
-              selectedPeriod === 'month' && { backgroundColor: theme.colors.primary }
-            ]}
-            onPress={() => setSelectedPeriod('month')}
-          >
-            <Text style={[
-              styles.filterText,
-              { color: selectedPeriod === 'month' ? theme.colors.onPrimary : theme.colors.onSurfaceVariant }
-            ]}>
-              This Month
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Podium Section */}
+          <View style={styles.podiumContainer}>
+            {/* First Place - Center */}
+            <View style={styles.firstPlaceContainer}>
+              <View style={styles.firstPlaceBadge}>
+                <Text style={styles.badgeNumber}>1</Text>
+              </View>
+              <View style={styles.firstPlaceAvatar}>
+                <Text style={styles.avatarEmoji}>🏆</Text>
+              </View>
+            </View>
 
-      {/* Leaderboard */}
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        {mockLeaderboard.map((player) => (
-          <Card
-            key={player.id}
-            style={[styles.playerCard, { backgroundColor: theme.colors.surface }]}
-            mode="outlined"
-          >
-            <Card.Content>
-              <View style={styles.playerRow}>
-                {/* Rank */}
-                <View style={styles.rankContainer}>
-                  <Text style={[styles.rankText, { color: getRankColor(player.rank) }]}>
-                    {getRankIcon(player.rank)}
-                  </Text>
-                </View>
-
-                {/* Avatar */}
-                <View style={styles.avatarContainer}>
-                  <Text style={styles.avatarText}>
-                    {player.avatar}
-                  </Text>
-                </View>
-
-                {/* Player Info */}
-                <View style={styles.playerInfo}>
-                  <Text style={[styles.playerName, { color: theme.colors.onSurface }]}>
-                    {player.username}
-                  </Text>
-                  <Text style={[styles.playerStats, { color: theme.colors.onSurfaceVariant }]}>
-                    {player.gamesWon} wins • {player.winRate}% win rate
-                  </Text>
-                </View>
-
-                {/* Chip Balance */}
-                <View style={styles.balanceContainer}>
-                  <Text style={[styles.balanceLabel, { color: theme.colors.onSurfaceVariant }]}>
-                    Chips
-                  </Text>
-                  <Text style={[styles.balanceValue, { color: theme.colors.primary }]}>
-                    ${player.chipBalance.toLocaleString()}
-                  </Text>
+            {/* Second and Third Place */}
+            <View style={styles.sidePodiums}>
+              <View style={styles.secondPlaceContainer}>
+                <View style={styles.secondPlaceBadge}>
+                  <Text style={styles.badgeNumber}>2</Text>
                 </View>
               </View>
-            </Card.Content>
-          </Card>
-        ))}
-      </ScrollView>
-      <MenuDrawer />
-    </View>
+              
+              <View style={styles.thirdPlaceContainer}>
+                <View style={styles.thirdPlaceBadge}>
+                  <Text style={styles.badgeNumber}>3</Text>
+                </View>
+                <View style={styles.thirdPlaceAvatar}>
+                  <Text style={styles.avatarEmoji}>👤</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Filter Tabs */}
+          <View style={styles.filterContainer}>
+            <Text style={styles.filterTab}>RANK</Text>
+            <Text style={styles.filterTab}>TOTAL CHIPS</Text>
+            <Text style={styles.filterTab}>POINTS</Text>
+          </View>
+
+          {/* Leaderboard List */}
+          <View style={styles.leaderboardContainer}>
+            {leaderboardData.map((player, index) => (
+              <View key={player.id} style={styles.playerRow}>
+                <View style={styles.playerRank}>
+                  <Text style={styles.rankNumber}>{player.position}</Text>
+                </View>
+                
+                <View style={styles.playerAvatar}>
+                  <Text style={styles.playerAvatarText}>{player.avatar}</Text>
+                </View>
+                
+                <View style={styles.playerInfo}>
+                  <Text style={styles.playerName}>{player.name}</Text>
+                </View>
+                
+                <View style={styles.playerStats}>
+                  <Text style={styles.playerScore}>{player.score}</Text>
+                  <Text style={styles.playerChange}>{player.change}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+
+        {/* Bottom Navigation Indicator */}
+        <View style={styles.bottomNav}>
+          <View style={styles.navIndicator} />
+        </View>
+      </SafeAreaView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F5F5F5',
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: scale(20),
+    paddingVertical: verticalScale(16),
   },
   title: {
-    fontSize: 24,
+    fontSize: scale(18),
     fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-  },
-  filtersContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  filterButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 12,
-  },
-  filterText: {
-    fontSize: 14,
-    fontWeight: '600',
+    color: '#999',
   },
   content: {
     flex: 1,
   },
-  contentContainer: {
-    padding: 20,
+  podiumContainer: {
+    alignItems: 'center',
+    paddingVertical: verticalScale(40),
+    position: 'relative',
   },
-  playerCard: {
-    marginBottom: 12,
+  firstPlaceContainer: {
+    alignItems: 'center',
+    zIndex: 3,
+  },
+  firstPlaceBadge: {
+    width: scale(60),
+    height: scale(60),
+    borderRadius: scale(30),
+    backgroundColor: '#FFD700',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: scale(10),
+  },
+  firstPlaceAvatar: {
+    width: scale(100),
+    height: scale(100),
+    borderRadius: scale(50),
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  sidePodiums: {
+    position: 'absolute',
+    top: verticalScale(60),
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: scale(40),
+  },
+  secondPlaceContainer: {
+    alignItems: 'center',
+  },
+  secondPlaceBadge: {
+    width: scale(50),
+    height: scale(50),
+    borderRadius: scale(25),
+    backgroundColor: '#C0C0C0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  thirdPlaceContainer: {
+    alignItems: 'center',
+  },
+  thirdPlaceBadge: {
+    width: scale(50),
+    height: scale(50),
+    borderRadius: scale(25),
+    backgroundColor: '#CD7F32',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: scale(10),
+  },
+  thirdPlaceAvatar: {
+    width: scale(60),
+    height: scale(60),
+    borderRadius: scale(30),
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeNumber: {
+    color: '#fff',
+    fontSize: scale(20),
+    fontWeight: 'bold',
+  },
+  avatarEmoji: {
+    fontSize: scale(40),
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: scale(20),
+    paddingVertical: verticalScale(20),
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  filterTab: {
+    fontSize: scale(12),
+    color: '#999',
+    fontWeight: 'bold',
+  },
+  leaderboardContainer: {
+    paddingHorizontal: scale(20),
+    paddingTop: verticalScale(20),
   },
   playerRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: verticalScale(16),
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
   },
-  rankContainer: {
-    width: 40,
+  playerRank: {
+    width: scale(30),
     alignItems: 'center',
-    marginRight: 12,
   },
-  rankText: {
-    fontSize: 18,
+  rankNumber: {
+    fontSize: scale(16),
     fontWeight: 'bold',
+    color: '#333',
   },
-  avatarContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#f0f0f0',
+  playerAvatar: {
+    width: scale(50),
+    height: scale(50),
+    borderRadius: scale(25),
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginHorizontal: scale(15),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  avatarText: {
-    fontSize: 24,
+  playerAvatarText: {
+    fontSize: scale(20),
   },
   playerInfo: {
     flex: 1,
   },
   playerName: {
-    fontSize: 16,
+    fontSize: scale(16),
     fontWeight: 'bold',
-    marginBottom: 2,
+    color: '#333',
   },
   playerStats: {
-    fontSize: 12,
-  },
-  balanceContainer: {
     alignItems: 'flex-end',
   },
-  balanceLabel: {
-    fontSize: 10,
-    marginBottom: 2,
-  },
-  balanceValue: {
-    fontSize: 14,
+  playerScore: {
+    fontSize: scale(16),
     fontWeight: 'bold',
+    color: '#333',
   },
-}); 
+  playerChange: {
+    fontSize: scale(12),
+    color: '#00E6C3',
+  },
+  bottomNav: {
+    alignItems: 'center',
+    paddingVertical: verticalScale(10),
+  },
+  navIndicator: {
+    width: scale(40),
+    height: scale(4),
+    backgroundColor: '#00E6C3',
+    borderRadius: scale(2),
+  },
+});

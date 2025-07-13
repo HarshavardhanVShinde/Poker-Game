@@ -1,204 +1,278 @@
-import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
-import { useLocalSearchParams } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import { PlayerAvatar } from '../../src/components/ui/PlayerAvatar';
-import { Card } from '../../src/components/ui/Card';
-import { Button } from '../../src/components/ui/Button';
-import { EmoteOverlay } from '../../src/components/ui/EmoteOverlay';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { View, StyleSheet, Dimensions, TouchableOpacity, StatusBar, SafeAreaView } from 'react-native';
+import { Text } from 'react-native-paper';
+import { useLocalSearchParams, router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-const samplePlayers = [
-  { avatar: '😎', name: 'PokerFace', chips: 480, isDealer: true, isActive: true },
-  { avatar: '🧑‍🦰', name: 'Dosdepicas', chips: 480 },
-  { avatar: '👩‍🦱', name: 'QueenBee', chips: 480 },
-  { avatar: '🧔', name: 'ChipKing', chips: 480 },
-  { avatar: '👩‍🎤', name: 'AceHigh', chips: 480 },
-  { avatar: '🧑‍🎓', name: 'Bluffster', chips: 480 },
-];
-
-const sampleCommunityCards = [
-  { value: '8', suit: 'D' },
-  { value: '5', suit: 'S' },
-  { value: 'A', suit: 'H' },
-];
-const samplePot = 40;
+// Responsive scaling
+const scale = (size: number) => (width / 375) * size;
+const verticalScale = (size: number) => (height / 812) * size;
 
 export default function GameScreen() {
-  const theme = useTheme();
   const { gameId } = useLocalSearchParams();
-  const [emoteVisible, setEmoteVisible] = useState(false);
+  const [cardsRevealed, setCardsRevealed] = useState(false);
 
-  // Arrange avatars in a circle/oval
-  const avatarPositions = [
-    { top: 10, left: width * 0.38 }, // top center
-    { top: width * 0.13, left: width * 0.08 }, // left top
-    { top: width * 0.36, left: width * 0.01 }, // left bottom
-    { top: width * 0.36, right: width * 0.01 }, // right bottom
-    { top: width * 0.13, right: width * 0.08 }, // right top
-    { top: width * 0.25, left: width * 0.38 }, // bottom center
-  ];
+  const handleCardPress = () => {
+    setCardsRevealed(!cardsRevealed);
+  };
 
-  const handleEmote = (emote: string) => {
-    setEmoteVisible(false);
-    alert(`Emote sent: ${emote}`);
+  const handleMenuPress = () => {
+    // Handle menu press
+  };
+
+  const handleEmojiPress = () => {
+    // Handle emoji press
   };
 
   return (
-    <View style={styles.flexContainer}>
-      {/* Gradient Background */}
-      <LinearGradient
-        colors={['#4ECDC4', '#45B7D1', '#FFFFFF']}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
-      {/* Poker Table Area */}
-      <View style={styles.tableContainer}>
-        {/* Player Avatars */}
-        {samplePlayers.map((player, i) => (
-          <View key={player.name} style={[styles.avatarPosition, avatarPositions[i]]}>
-            <PlayerAvatar {...player} />
+    <>
+      <StatusBar barStyle="light-content" backgroundColor="#00E6C3" />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.gameArea}>
+          {/* Header with menu */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={handleMenuPress}>
+              <Ionicons name="menu" size={scale(24)} color="#fff" />
+            </TouchableOpacity>
           </View>
-        ))}
-        {/* Table Center: Community Cards and Pot */}
-        <View style={styles.tableCenter}>
-          <View style={styles.cardsRow}>
-            {sampleCommunityCards.map((card, i) => (
-              <Card key={i} value={card.value} suit={card.suit} size="large" style={styles.card} />
-            ))}
+
+          {/* Opponent Player */}
+          <View style={styles.opponentContainer}>
+            <View style={styles.playerAvatar}>
+              <Text style={styles.dealerBadge}>D</Text>
+              <View style={styles.avatarCircle}>
+                <Text style={styles.avatarText}>👤</Text>
+              </View>
+            </View>
+            <Text style={styles.playerName}>Dosdepicas (480)</Text>
+            <Text style={styles.playerChips}>20</Text>
           </View>
-          <View style={styles.potContainer}>
-            <Text style={styles.potLabel}>Pot</Text>
-            <Text style={styles.potValue}>{samplePot}</Text>
+
+          {/* Center Area with Logo and Pot */}
+          <View style={styles.centerArea}>
+            <View style={styles.logoContainer}>
+              <Text style={styles.logoIcon}>🃏</Text>
+              <Text style={styles.logoText}>EasyPoker</Text>
+            </View>
+            <Text style={styles.potAmount}>10</Text>
+          </View>
+
+          {/* Player Cards */}
+          <TouchableOpacity 
+            style={styles.cardsContainer} 
+            onPress={handleCardPress}
+            activeOpacity={0.9}
+          >
+            <View style={styles.cardPair}>
+              {cardsRevealed ? (
+                <>
+                  <View style={[styles.card, styles.cardLeft]}>
+                    <Text style={styles.cardValue}>3</Text>
+                    <Text style={styles.cardSuit}>♦</Text>
+                  </View>
+                  <View style={[styles.card, styles.cardRight]}>
+                    <Text style={styles.cardValue}>10</Text>
+                    <Text style={styles.cardSuit}>♣</Text>
+                  </View>
+                </>
+              ) : (
+                <>
+                  <View style={[styles.card, styles.cardBack, styles.cardLeft]} />
+                  <View style={[styles.card, styles.cardBack, styles.cardRight]} />
+                </>
+              )}
+            </View>
+          </TouchableOpacity>
+
+          {/* Player Info */}
+          <View style={styles.playerContainer}>
+            <Text style={styles.playerName}>PokerFace (490)</Text>
+            <TouchableOpacity style={styles.emojiButton} onPress={handleEmojiPress}>
+              <Text style={styles.emojiIcon}>😊</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Action Buttons */}
+          <View style={styles.actionsContainer}>
+            <TouchableOpacity style={styles.actionButton}>
+              <Text style={styles.actionButtonText}>Fold</Text>
+              <Text style={styles.actionButtonValue}>41</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.actionButton}>
+              <Text style={styles.actionButtonText}>Call</Text>
+              <Text style={styles.actionButtonValue}>10</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.actionButton}>
+              <Text style={styles.actionButtonText}>Raise</Text>
+              <Text style={styles.actionButtonValue}>40</Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </View>
-      {/* Action Buttons */}
-      <View style={styles.actionsRow}>
-        <Button title="Fold" variant="danger" size="large" style={styles.actionButton} onPress={() => {}} />
-        <Button title="Check" variant="secondary" size="large" style={styles.actionButton} onPress={() => {}} />
-        <Button title="Bet" variant="primary" size="large" style={styles.actionButton} onPress={() => {}} />
-        <Button title="Raise" variant="outline" size="large" style={styles.actionButton} onPress={() => {}} />
-      </View>
-      {/* Floating Emote Button */}
-      <View style={styles.emoteFabContainer}>
-        <Button
-          title="😊"
-          onPress={() => setEmoteVisible(true)}
-          style={styles.emoteFab}
-          size="large"
-          variant="secondary"
-          textStyle={{ fontSize: 32, fontFamily: 'Poppins_700Bold' }}
-        />
-      </View>
-      {/* Emote Overlay */}
-      <EmoteOverlay
-        visible={emoteVisible}
-        onClose={() => setEmoteVisible(false)}
-        onEmote={handleEmote}
-      />
-    </View>
+      </SafeAreaView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  flexContainer: {
+  container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#00E6C3',
   },
-  tableContainer: {
-    width: width * 0.92,
-    height: width * 0.6,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: width * 0.4,
-    justifyContent: 'center',
+  gameArea: {
+    flex: 1,
+    paddingHorizontal: scale(20),
+    paddingVertical: verticalScale(20),
+  },
+  header: {
+    alignItems: 'flex-end',
+    marginBottom: verticalScale(20),
+  },
+  opponentContainer: {
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.10,
-    shadowRadius: 24,
-    elevation: 8,
-    borderWidth: 2,
-    borderColor: '#E0F7FA',
+    marginBottom: verticalScale(40),
+  },
+  playerAvatar: {
     position: 'relative',
+    marginBottom: scale(8),
   },
-  avatarPosition: {
+  dealerBadge: {
     position: 'absolute',
+    top: scale(-5),
+    right: scale(-5),
+    backgroundColor: '#fff',
+    color: '#00E6C3',
+    fontSize: scale(12),
+    fontWeight: 'bold',
+    paddingHorizontal: scale(6),
+    paddingVertical: scale(2),
+    borderRadius: scale(10),
     zIndex: 2,
   },
-  tableCenter: {
+  avatarCircle: {
+    width: scale(60),
+    height: scale(60),
+    borderRadius: scale(30),
+    backgroundColor: 'rgba(255,255,255,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1,
   },
-  cardsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  avatarText: {
+    fontSize: scale(24),
+  },
+  playerName: {
+    color: '#fff',
+    fontSize: scale(16),
+    fontWeight: 'bold',
+    marginBottom: scale(4),
+  },
+  playerChips: {
+    color: '#fff',
+    fontSize: scale(24),
+    fontWeight: 'bold',
+  },
+  centerArea: {
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: verticalScale(60),
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: scale(20),
+  },
+  logoIcon: {
+    fontSize: scale(40),
+    marginBottom: scale(8),
+  },
+  logoText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: scale(24),
+    fontWeight: 'bold',
+  },
+  potAmount: {
+    color: '#fff',
+    fontSize: scale(32),
+    fontWeight: 'bold',
+  },
+  cardsContainer: {
+    alignItems: 'center',
+    marginBottom: verticalScale(20),
+  },
+  cardPair: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   card: {
-    marginHorizontal: 6,
-  },
-  potContainer: {
-    backgroundColor: '#4ECDC4',
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    flexDirection: 'row',
+    width: scale(80),
+    height: scale(110),
+    borderRadius: scale(12),
+    backgroundColor: '#fff',
+    justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.10,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  potLabel: {
-    fontFamily: 'Poppins_700Bold',
-    color: '#fff',
-    fontSize: 18,
-    marginRight: 8,
+  cardLeft: {
+    marginRight: scale(-10),
+    zIndex: 2,
   },
-  potValue: {
-    fontFamily: 'Poppins_700Bold',
-    color: '#FFD700',
-    fontSize: 20,
+  cardRight: {
+    marginLeft: scale(-10),
+    zIndex: 1,
   },
-  actionsRow: {
+  cardBack: {
+    backgroundColor: '#B8E6FF',
+  },
+  cardValue: {
+    fontSize: scale(24),
+    fontWeight: 'bold',
+    color: '#E91E63',
+    marginBottom: scale(-5),
+  },
+  cardSuit: {
+    fontSize: scale(20),
+    color: '#E91E63',
+  },
+  playerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: width * 0.92,
-    marginTop: 24,
-    marginBottom: 16,
-    alignSelf: 'center',
+    marginBottom: verticalScale(40),
+  },
+  emojiButton: {
+    width: scale(40),
+    height: scale(40),
+    borderRadius: scale(20),
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emojiIcon: {
+    fontSize: scale(20),
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: scale(10),
   },
   actionButton: {
     flex: 1,
-    marginHorizontal: 6,
-  },
-  emoteFabContainer: {
-    position: 'absolute',
-    bottom: 32,
-    right: 24,
-    zIndex: 10,
-  },
-  emoteFab: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 0,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 6,
+    marginHorizontal: scale(5),
   },
-}); 
+  actionButtonText: {
+    color: '#fff',
+    fontSize: scale(18),
+    fontWeight: 'bold',
+    marginBottom: scale(4),
+  },
+  actionButtonValue: {
+    color: '#fff',
+    fontSize: scale(16),
+  },
+});

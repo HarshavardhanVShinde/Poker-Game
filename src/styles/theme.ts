@@ -4,7 +4,7 @@ const inputStyles = {
   roundness: 999,
   mode: 'outlined',
   outlineColor: '#E0E0E0',
-  activeOutlineColor: '#4ECDC4',
+  activeOutlineColor: '#00E6C3',
   textColor: '#1A1A1A',
   fontSize: 18,
   fontFamily: 'Poppins_400Regular',
@@ -19,7 +19,7 @@ export const darkTheme = {
   ...MD3DarkTheme,
   colors: {
     ...MD3DarkTheme.colors,
-    primary: '#FF6B35',
+    primary: '#00E6C3',
     secondary: '#4ECDC4',
     tertiary: '#45B7D1',
     background: '#1A1A1A',
@@ -32,10 +32,10 @@ export const darkTheme = {
     outlineVariant: '#444444',
     // Poker specific colors
     chip: '#FFD700',
-    cardBack: '#2C5F2D',
-    table: '#0F5132',
-    pot: '#FF6B35',
-    playerActive: '#4ECDC4',
+    cardBack: '#B8E6FF',
+    table: '#00E6C3',
+    pot: '#00E6C3',
+    playerActive: '#00E6C3',
     playerInactive: '#666666',
     fold: '#FF4757',
     check: '#2ED573',
@@ -50,10 +50,10 @@ export const lightTheme = {
   ...MD3LightTheme,
   colors: {
     ...MD3LightTheme.colors,
-    primary: '#FF6B35',
+    primary: '#00E6C3',
     secondary: '#4ECDC4',
     tertiary: '#45B7D1',
-    background: '#F8F9FA',
+    background: '#F5F5F5',
     surface: '#FFFFFF',
     surfaceVariant: '#F1F3F4',
     onBackground: '#1A1A1A',
@@ -63,10 +63,10 @@ export const lightTheme = {
     outlineVariant: '#E8EAED',
     // Poker specific colors
     chip: '#FFD700',
-    cardBack: '#2C5F2D',
-    table: '#0F5132',
-    pot: '#FF6B35',
-    playerActive: '#4ECDC4',
+    cardBack: '#B8E6FF',
+    table: '#00E6C3',
+    pot: '#00E6C3',
+    playerActive: '#00E6C3',
     playerInactive: '#9AA0A6',
     fold: '#FF4757',
     check: '#2ED573',
@@ -77,4 +77,4 @@ export const lightTheme = {
   },
 };
 
-export type AppTheme = typeof darkTheme; 
+export type AppTheme = typeof darkTheme;

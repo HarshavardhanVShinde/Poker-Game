@@ -1,34 +1,30 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Dimensions, Platform } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
-import { BOTTOM_TABS } from '../../src/utils/constants';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('screen');
 const scale = (size: number) => (width / 375) * size;
 
 export default function TabsLayout() {
-  const theme = useTheme();
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: theme.colors.surface,
-          borderTopColor: theme.colors.outline,
+          backgroundColor: '#fff',
+          borderTopColor: '#E0E0E0',
           borderTopWidth: 1,
           height: Platform.OS === 'ios' ? scale(85) : scale(70),
           paddingBottom: Platform.OS === 'ios' ? scale(20) : scale(8),
           paddingTop: scale(8),
           paddingHorizontal: scale(16),
         },
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
+        tabBarActiveTintColor: '#00E6C3',
+        tabBarInactiveTintColor: '#999',
         tabBarLabelStyle: {
           fontSize: scale(11),
           fontWeight: '600',
-          fontFamily: 'Poppins_600SemiBold',
           marginTop: scale(4),
         },
         tabBarIconStyle: {
@@ -42,7 +38,7 @@ export default function TabsLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size }) => (
-            <Text style={{ color, fontSize: scale(20) }}>🏠</Text>
+            <Ionicons name="home" size={scale(20)} color={color} />
           ),
         }}
       />
@@ -51,7 +47,7 @@ export default function TabsLayout() {
         options={{
           title: 'Find Game',
           tabBarIcon: ({ color, size }) => (
-            <Text style={{ color, fontSize: scale(20) }}>🎮</Text>
+            <Ionicons name="search" size={scale(20)} color={color} />
           ),
         }}
       />
@@ -60,7 +56,7 @@ export default function TabsLayout() {
         options={{
           title: 'Rank',
           tabBarIcon: ({ color, size }) => (
-            <Text style={{ color, fontSize: scale(20) }}>🏆</Text>
+            <Ionicons name="bar-chart" size={scale(20)} color={color} />
           ),
         }}
       />
@@ -69,10 +65,10 @@ export default function TabsLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => (
-            <Text style={{ color, fontSize: scale(20) }}>👤</Text>
+            <Ionicons name="person" size={scale(20)} color={color} />
           ),
         }}
       />
     </Tabs>
   );
-} 
+}

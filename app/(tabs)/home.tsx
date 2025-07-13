@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ImageBackground, Dimensions, TouchableOpacity, StatusBar, SafeAreaView } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
+import { View, StyleSheet, Dimensions, TouchableOpacity, StatusBar, SafeAreaView } from 'react-native';
+import { Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '../../src/store';
+import { router } from 'expo-router';
+import { useDispatch } from 'react-redux';
 import { toggleMenu } from '../../src/store/uiSlice';
 import { MenuDrawer } from '../../src/components/layout/MenuDrawer';
 
-const { width, height } = Dimensions.get('screen');
-const bgImage = { uri: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80' };
+const { width, height } = Dimensions.get('window');
 
 // Responsive scaling
 const scale = (size: number) => (width / 375) * size;
@@ -18,287 +17,137 @@ const GAME_TYPES = [
   { value: 'private', label: 'Private Game' },
   { value: 'matchmaking', label: 'Matchmaking' },
 ];
+
 const POKER_VARIANTS = [
   { value: 'holdem', label: "Hold'em" },
   { value: 'omaha', label: 'Omaha' },
   { value: 'shortdeck', label: 'Short Deck' },
   { value: 'reverse', label: "Reverse Hold'em" },
 ];
-const CARD_FACES = [
-  { value: 'classic', label: '8♠ K♥' },
-  { value: 'cartoon', label: '8♠ K👑♥' },
-  { value: 'blue', label: '8♠ K💙' },
-];
-const CARD_BACKS = [
-  { value: 'red', color: '#FFB6B6' },
-  { value: 'blue', color: '#B6E0FF' },
-  { value: 'purple', color: '#E0B6FF' },
-];
-const CHIP_STYLES = [
-  { value: 'red', color: '#FF6B6B' },
-  { value: 'pink', color: '#FFB6B6' },
-  { value: 'green', color: '#2ED573' },
-];
 
 export default function HomeScreen() {
-  const theme = useTheme();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const [gameType, setGameType] = useState(GAME_TYPES[0]);
   const [variant, setVariant] = useState(POKER_VARIANTS[0]);
-  const [showTypeMenu, setShowTypeMenu] = useState(false);
-  const [showVariantMenu, setShowVariantMenu] = useState(false);
-  const [cardFace, setCardFace] = useState(CARD_FACES[0]);
-  const [cardBack, setCardBack] = useState(CARD_BACKS[1]);
-  const [chipStyle, setChipStyle] = useState(CHIP_STYLES[0]);
 
   const handleMenuPress = () => {
     dispatch(toggleMenu());
   };
 
+  const handlePlayPress = () => {
+    // Navigate to game screen
+    router.push('/game/demo-game');
+  };
+
   return (
     <>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      <SafeAreaView style={styles.flexContainer}>
-      <ImageBackground source={bgImage} style={styles.bgImage} resizeMode="cover">
-        {/* Overlay for bottom fade */}
-        <View style={styles.overlay} />
-        {/* Top bar icons */}
-        <View style={styles.topBar}>
-          <Ionicons name="person-circle-outline" size={scale(24)} color="#fff" style={styles.topIcon} />
-          <Ionicons name="search" size={scale(24)} color="#fff" style={styles.topIcon} />
-          <TouchableOpacity onPress={handleMenuPress}>
-            <Ionicons name="menu" size={scale(24)} color="#fff" style={styles.topIcon} />
-          </TouchableOpacity>
-        </View>
-        {/* Heading */}
-        <View style={styles.headingContainer}>
-          <Text style={styles.heading}>{`Poker
-with your
-Friends`}</Text>
-        </View>
-        {/* Floating game type/variant bar */}
-        <View style={styles.floatingBar}>
-          <TouchableOpacity style={styles.dropdown} onPress={() => setShowTypeMenu(!showTypeMenu)}>
-            <Text style={styles.dropdownText}>{gameType.label}</Text>
-            <Ionicons name="chevron-down" size={scale(16)} color="#888" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dropdown} onPress={() => setShowVariantMenu(!showVariantMenu)}>
-            <Text style={styles.dropdownText}>{variant.label}</Text>
-            <Ionicons name="chevron-down" size={scale(16)} color="#888" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.playButton}>
-            <Ionicons name="play" size={scale(24)} color="#00e6c3" />
-          </TouchableOpacity>
-        </View>
-        {/* Selectors Section */}
-        <View style={styles.selectorsSection}>
-          <Text style={styles.selectorLabel}>Card Face</Text>
-          <View style={styles.selectorRow}>
-            {CARD_FACES.map((face) => (
-              <TouchableOpacity
-                key={face.value}
-                style={[styles.selectorBox, cardFace.value === face.value && styles.selectorBoxActive]}
-                onPress={() => setCardFace(face)}
-              >
-                <Text style={styles.selectorBoxText}>{face.label}</Text>
-                {cardFace.value === face.value && (
-                  <View style={styles.checkmark}>
-                    <Ionicons name="checkmark-circle" size={scale(18)} color="#00e6c3" />
-                  </View>
-                )}
-              </TouchableOpacity>
-            ))}
+      <StatusBar barStyle="light-content" backgroundColor="#00E6C3" />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.content}>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={handleMenuPress}>
+              <Ionicons name="menu" size={scale(24)} color="#fff" />
+            </TouchableOpacity>
           </View>
-          <Text style={styles.selectorLabel}>Back Style</Text>
-          <View style={styles.selectorRow}>
-            {CARD_BACKS.map((back) => (
-              <TouchableOpacity
-                key={back.value}
-                style={[styles.selectorBox, { backgroundColor: back.color }, cardBack.value === back.value && styles.selectorBoxActive]}
-                onPress={() => setCardBack(back)}
-              >
-                {cardBack.value === back.value && (
-                  <View style={styles.checkmark}>
-                    <Ionicons name="checkmark-circle" size={scale(18)} color="#00e6c3" />
-                  </View>
-                )}
+
+          {/* Main Content */}
+          <View style={styles.mainContent}>
+            <Text style={styles.title}>EasyPoker</Text>
+            <Text style={styles.subtitle}>Play poker with friends</Text>
+
+            {/* Game Selection */}
+            <View style={styles.selectionContainer}>
+              <TouchableOpacity style={styles.selector}>
+                <Text style={styles.selectorText}>{gameType.label}</Text>
+                <Ionicons name="chevron-down" size={scale(16)} color="#00E6C3" />
               </TouchableOpacity>
-            ))}
-          </View>
-          <Text style={styles.selectorLabel}>Chip Style</Text>
-          <View style={styles.selectorRow}>
-            {CHIP_STYLES.map((chip) => (
-              <TouchableOpacity
-                key={chip.value}
-                style={[styles.selectorBox, { backgroundColor: chip.color }, chipStyle.value === chip.value && styles.selectorBoxActive]}
-                onPress={() => setChipStyle(chip)}
-              >
-                {chipStyle.value === chip.value && (
-                  <View style={styles.checkmark}>
-                    <Ionicons name="checkmark-circle" size={scale(18)} color="#00e6c3" />
-                  </View>
-                )}
+
+              <TouchableOpacity style={styles.selector}>
+                <Text style={styles.selectorText}>{variant.label}</Text>
+                <Ionicons name="chevron-down" size={scale(16)} color="#00E6C3" />
               </TouchableOpacity>
-            ))}
+            </View>
+
+            {/* Play Button */}
+            <TouchableOpacity style={styles.playButton} onPress={handlePlayPress}>
+              <Ionicons name="play" size={scale(32)} color="#fff" />
+            </TouchableOpacity>
           </View>
         </View>
-      </ImageBackground>
-      <MenuDrawer />
+        <MenuDrawer />
       </SafeAreaView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  flexContainer: {
+  container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#00E6C3',
   },
-  bgImage: {
+  content: {
     flex: 1,
+    paddingHorizontal: scale(20),
+  },
+  header: {
+    alignItems: 'flex-end',
+    paddingTop: verticalScale(20),
+    paddingBottom: verticalScale(40),
+  },
+  mainContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: scale(36),
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: scale(8),
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: scale(18),
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: verticalScale(60),
+    textAlign: 'center',
+  },
+  selectionContainer: {
     width: '100%',
-    height: '100%',
-    justifyContent: 'flex-end',
+    marginBottom: verticalScale(40),
   },
-  overlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: verticalScale(400),
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderTopLeftRadius: scale(32),
-    borderTopRightRadius: scale(32),
-    zIndex: 1,
-  },
-  topBar: {
-    position: 'absolute',
-    top: verticalScale(50),
-    left: 0,
-    right: 0,
+  selector: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: scale(20),
-    zIndex: 2,
-  },
-  topIcon: {
-    marginHorizontal: scale(4),
-    padding: scale(8),
-  },
-  headingContainer: {
-    position: 'absolute',
-    top: verticalScale(180),
-    left: 0,
-    right: 0,
-    alignItems: 'flex-start',
-    paddingHorizontal: scale(24),
-    zIndex: 2,
-  },
-  heading: {
-    fontSize: scale(36),
-    fontFamily: 'Poppins_700Bold',
-    color: '#fff',
-    fontWeight: 'bold',
-    lineHeight: scale(40),
-    letterSpacing: 0.5,
-    textShadowColor: 'rgba(0,0,0,0.12)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
-  },
-  floatingBar: {
-    position: 'absolute',
-    top: verticalScale(350),
-    left: scale(16),
-    right: scale(16),
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: scale(25),
-    paddingVertical: scale(12),
-    paddingHorizontal: scale(16),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-    zIndex: 3,
-  },
-  dropdown: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f1f3f4',
-    borderRadius: scale(18),
-    paddingHorizontal: scale(12),
-    paddingVertical: scale(10),
-    marginRight: scale(8),
-  },
-  dropdownText: {
-    fontFamily: 'Poppins_600SemiBold',
-    fontSize: scale(14),
-    color: '#222',
-    marginRight: scale(6),
-    flex: 1,
-  },
-  playButton: {
-    backgroundColor: '#f1f3f4',
-    borderRadius: scale(18),
-    padding: scale(10),
-    marginLeft: scale(4),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  selectorsSection: {
-    position: 'absolute',
-    top: verticalScale(450),
-    left: 0,
-    right: 0,
-    zIndex: 4,
     paddingHorizontal: scale(20),
-    paddingTop: scale(16),
-  },
-  selectorLabel: {
-    fontFamily: 'Poppins_700Bold',
-    fontSize: scale(16),
-    color: '#5F6368',
-    marginBottom: scale(8),
-    marginTop: scale(12),
-  },
-  selectorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: scale(8),
-  },
-  selectorBox: {
-    width: scale(56),
-    height: scale(56),
-    borderRadius: scale(14),
-    backgroundColor: '#fff',
-    marginRight: scale(12),
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: verticalScale(16),
+    borderRadius: scale(12),
+    marginBottom: scale(16),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    position: 'relative',
   },
-  selectorBoxActive: {
-    borderWidth: 2,
-    borderColor: '#00e6c3',
+  selectorText: {
+    fontSize: scale(16),
+    fontWeight: '600',
+    color: '#333',
   },
-  selectorBoxText: {
-    fontFamily: 'Poppins_600SemiBold',
-    fontSize: scale(14),
-    color: '#222',
-    textAlign: 'center',
+  playButton: {
+    width: scale(80),
+    height: scale(80),
+    borderRadius: scale(40),
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  checkmark: {
-    position: 'absolute',
-    top: scale(4),
-    right: scale(4),
-    backgroundColor: 'transparent',
-  },
-}); 
+});
