@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ImageBackground, Dimensions, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ImageBackground, Dimensions, TouchableOpacity, StatusBar, SafeAreaView } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,8 +7,12 @@ import { RootState, AppDispatch } from '../../src/store';
 import { toggleMenu } from '../../src/store/uiSlice';
 import { MenuDrawer } from '../../src/components/layout/MenuDrawer';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('screen');
 const bgImage = { uri: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80' };
+
+// Responsive scaling
+const scale = (size: number) => (width / 375) * size;
+const verticalScale = (size: number) => (height / 812) * size;
 
 const GAME_TYPES = [
   { value: 'private', label: 'Private Game' },
@@ -52,16 +56,18 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.flexContainer}>
+    <>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <SafeAreaView style={styles.flexContainer}>
       <ImageBackground source={bgImage} style={styles.bgImage} resizeMode="cover">
         {/* Overlay for bottom fade */}
         <View style={styles.overlay} />
         {/* Top bar icons */}
         <View style={styles.topBar}>
-          <Ionicons name="person-circle-outline" size={28} color="#fff" style={styles.topIcon} />
-          <Ionicons name="search" size={28} color="#fff" style={styles.topIcon} />
+          <Ionicons name="person-circle-outline" size={scale(24)} color="#fff" style={styles.topIcon} />
+          <Ionicons name="search" size={scale(24)} color="#fff" style={styles.topIcon} />
           <TouchableOpacity onPress={handleMenuPress}>
-            <Ionicons name="menu" size={28} color="#fff" style={styles.topIcon} />
+            <Ionicons name="menu" size={scale(24)} color="#fff" style={styles.topIcon} />
           </TouchableOpacity>
         </View>
         {/* Heading */}
@@ -74,14 +80,14 @@ Friends`}</Text>
         <View style={styles.floatingBar}>
           <TouchableOpacity style={styles.dropdown} onPress={() => setShowTypeMenu(!showTypeMenu)}>
             <Text style={styles.dropdownText}>{gameType.label}</Text>
-            <Ionicons name="chevron-down" size={18} color="#888" />
+            <Ionicons name="chevron-down" size={scale(16)} color="#888" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.dropdown} onPress={() => setShowVariantMenu(!showVariantMenu)}>
             <Text style={styles.dropdownText}>{variant.label}</Text>
-            <Ionicons name="chevron-down" size={18} color="#888" />
+            <Ionicons name="chevron-down" size={scale(16)} color="#888" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.playButton}>
-            <Ionicons name="play" size={28} color="#00e6c3" />
+            <Ionicons name="play" size={scale(24)} color="#00e6c3" />
           </TouchableOpacity>
         </View>
         {/* Selectors Section */}
@@ -97,7 +103,7 @@ Friends`}</Text>
                 <Text style={styles.selectorBoxText}>{face.label}</Text>
                 {cardFace.value === face.value && (
                   <View style={styles.checkmark}>
-                    <Ionicons name="checkmark-circle" size={22} color="#00e6c3" />
+                    <Ionicons name="checkmark-circle" size={scale(18)} color="#00e6c3" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -113,7 +119,7 @@ Friends`}</Text>
               >
                 {cardBack.value === back.value && (
                   <View style={styles.checkmark}>
-                    <Ionicons name="checkmark-circle" size={22} color="#00e6c3" />
+                    <Ionicons name="checkmark-circle" size={scale(18)} color="#00e6c3" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -129,7 +135,7 @@ Friends`}</Text>
               >
                 {chipStyle.value === chip.value && (
                   <View style={styles.checkmark}>
-                    <Ionicons name="checkmark-circle" size={22} color="#00e6c3" />
+                    <Ionicons name="checkmark-circle" size={scale(18)} color="#00e6c3" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -138,7 +144,8 @@ Friends`}</Text>
         </View>
       </ImageBackground>
       <MenuDrawer />
-    </View>
+      </SafeAreaView>
+    </>
   );
 }
 
@@ -158,41 +165,42 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: width * 0.7,
+    height: verticalScale(400),
     backgroundColor: 'rgba(255,255,255,0.92)',
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
+    borderTopLeftRadius: scale(32),
+    borderTopRightRadius: scale(32),
     zIndex: 1,
   },
   topBar: {
     position: 'absolute',
-    top: 48,
+    top: verticalScale(50),
     left: 0,
     right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: scale(20),
     zIndex: 2,
   },
   topIcon: {
-    marginHorizontal: 4,
+    marginHorizontal: scale(4),
+    padding: scale(8),
   },
   headingContainer: {
     position: 'absolute',
-    top: width * 0.32,
+    top: verticalScale(180),
     left: 0,
     right: 0,
     alignItems: 'flex-start',
-    paddingHorizontal: 32,
+    paddingHorizontal: scale(24),
     zIndex: 2,
   },
   heading: {
-    fontSize: 40,
+    fontSize: scale(36),
     fontFamily: 'Poppins_700Bold',
     color: '#fff',
     fontWeight: 'bold',
-    lineHeight: 44,
+    lineHeight: scale(40),
     letterSpacing: 0.5,
     textShadowColor: 'rgba(0,0,0,0.12)',
     textShadowOffset: { width: 0, height: 2 },
@@ -200,20 +208,20 @@ const styles = StyleSheet.create({
   },
   floatingBar: {
     position: 'absolute',
-    top: width * 0.62,
-    left: 16,
-    right: 16,
+    top: verticalScale(350),
+    left: scale(16),
+    right: scale(16),
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 32,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
+    borderRadius: scale(25),
+    paddingVertical: scale(12),
+    paddingHorizontal: scale(16),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.10,
+    shadowOpacity: 0.15,
     shadowRadius: 12,
-    elevation: 4,
+    elevation: 8,
     zIndex: 3,
   },
   dropdown: {
@@ -221,59 +229,60 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f1f3f4',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    marginRight: 10,
+    borderRadius: scale(18),
+    paddingHorizontal: scale(12),
+    paddingVertical: scale(10),
+    marginRight: scale(8),
   },
   dropdownText: {
     fontFamily: 'Poppins_600SemiBold',
-    fontSize: 16,
+    fontSize: scale(14),
     color: '#222',
-    marginRight: 6,
+    marginRight: scale(6),
+    flex: 1,
   },
   playButton: {
     backgroundColor: '#f1f3f4',
-    borderRadius: 20,
-    padding: 8,
-    marginLeft: 6,
+    borderRadius: scale(18),
+    padding: scale(10),
+    marginLeft: scale(4),
     alignItems: 'center',
     justifyContent: 'center',
   },
   selectorsSection: {
     position: 'absolute',
-    top: width * 0.82,
+    top: verticalScale(450),
     left: 0,
     right: 0,
     zIndex: 4,
-    paddingHorizontal: 24,
-    paddingTop: 12,
+    paddingHorizontal: scale(20),
+    paddingTop: scale(16),
   },
   selectorLabel: {
     fontFamily: 'Poppins_700Bold',
-    fontSize: 18,
+    fontSize: scale(16),
     color: '#5F6368',
-    marginBottom: 8,
-    marginTop: 12,
+    marginBottom: scale(8),
+    marginTop: scale(12),
   },
   selectorRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: scale(8),
   },
   selectorBox: {
-    width: 64,
-    height: 64,
-    borderRadius: 16,
+    width: scale(56),
+    height: scale(56),
+    borderRadius: scale(14),
     backgroundColor: '#fff',
-    marginRight: 16,
+    marginRight: scale(12),
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
     position: 'relative',
   },
   selectorBoxActive: {
@@ -282,14 +291,14 @@ const styles = StyleSheet.create({
   },
   selectorBoxText: {
     fontFamily: 'Poppins_600SemiBold',
-    fontSize: 18,
+    fontSize: scale(14),
     color: '#222',
     textAlign: 'center',
   },
   checkmark: {
     position: 'absolute',
-    top: 4,
-    right: 4,
+    top: scale(4),
+    right: scale(4),
     backgroundColor: 'transparent',
   },
 }); 

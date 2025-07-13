@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Platform,
-  PixelRatio,
+  StatusBar,
 } from 'react-native';
 import { Text, TextInput, useTheme } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,9 +17,11 @@ import { setShowGuestModal } from '../../store/uiSlice';
 import { validateUsername } from '../../utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('screen');
 
-const scale = (size: number) => PixelRatio.roundToNearestPixel(size * (width / 375));
+// Responsive scaling
+const scale = (size: number) => (width / 375) * size;
+const verticalScale = (size: number) => (height / 812) * size;
 
 export const GuestLoginModal: React.FC = () => {
   const theme = useTheme();
@@ -59,7 +61,9 @@ export const GuestLoginModal: React.FC = () => {
   if (!showGuestModal) return null;
 
   return (
-    <View style={styles.overlay}>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="rgba(0,0,0,0.5)" />
+      <View style={styles.overlay}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         bounces={false}
@@ -68,7 +72,7 @@ export const GuestLoginModal: React.FC = () => {
       >
         <View style={styles.modal}>
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-            <Ionicons name="close" size={scale(24)} color="#888" />
+            <Ionicons name="close" size={scale(20)} color="#888" />
           </TouchableOpacity>
 
           <Text style={styles.heading}>Play as Guest</Text>
@@ -83,8 +87,10 @@ export const GuestLoginModal: React.FC = () => {
             }}
             mode="outlined"
             autoCapitalize="none"
+            autoComplete="username"
             style={styles.input}
             theme={theme}
+            contentStyle={styles.inputContent}
             error={!!validationError}
           />
 
@@ -113,7 +119,8 @@ export const GuestLoginModal: React.FC = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+      </View>
+    </>
   );
 };
 
@@ -124,7 +131,7 @@ const styles = StyleSheet.create({
     left: 0,
     width,
     height,
-    backgroundColor: 'rgba(0,0,0,0.25)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
@@ -134,76 +141,87 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: height * 0.05,
+    paddingVertical: verticalScale(40),
+    paddingHorizontal: scale(20),
   },
   modal: {
-    width: '88%',
-    maxWidth: 420,
+    width: '100%',
+    maxWidth: scale(380),
     backgroundColor: '#fff',
-    borderRadius: 28,
-    paddingVertical: height * 0.04,
-    paddingHorizontal: width * 0.06,
+    borderRadius: scale(24),
+    paddingVertical: verticalScale(32),
+    paddingHorizontal: scale(24),
     alignItems: 'flex-start',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 8,
+    elevation: 12,
     position: 'relative',
   },
   closeButton: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? 24 : 16,
-    left: 16,
-    padding: 8,
+    top: scale(16),
+    left: scale(16),
+    padding: scale(8),
     zIndex: 2,
+    borderRadius: scale(16),
+    backgroundColor: 'rgba(0,0,0,0.05)',
   },
   heading: {
     fontFamily: 'Poppins_700Bold',
-    fontSize: scale(22),
+    fontSize: scale(24),
     color: '#111',
     fontWeight: '700',
-    marginBottom: 6,
+    marginBottom: scale(6),
+    marginTop: scale(32),
     textAlign: 'left',
   },
   subheading: {
     fontFamily: 'Poppins_400Regular',
-    fontSize: scale(14),
+    fontSize: scale(15),
     color: '#555',
-    marginBottom: 24,
+    marginBottom: scale(24),
     textAlign: 'left',
+    lineHeight: scale(20),
   },
   input: {
     width: '100%',
-    marginBottom: 16,
-    fontSize: scale(14),
-    borderRadius: 20,
+    marginBottom: scale(16),
+    backgroundColor: '#fff',
+  },
+  inputContent: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: scale(16),
+    paddingHorizontal: scale(16),
   },
   errorText: {
-    fontSize: scale(12),
-    marginBottom: 10,
+    fontSize: scale(13),
+    marginBottom: scale(10),
     textAlign: 'left',
     fontFamily: 'Poppins_400Regular',
   },
   playButton: {
     width: '100%',
     backgroundColor: '#00e6c3',
-    borderRadius: 28,
-    paddingVertical: height * 0.018,
+    borderRadius: scale(25),
+    paddingVertical: verticalScale(16),
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: scale(8),
     shadowColor: '#00e6c3',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 6,
-    elevation: 2,
+    elevation: 5,
   },
   playButtonDisabled: {
-    backgroundColor: '#b2f7e6',
+    backgroundColor: '#ccc',
+    shadowOpacity: 0,
+    elevation: 0,
   },
   playButtonText: {
     fontFamily: 'Poppins_700Bold',
-    fontSize: scale(16),
+    fontSize: scale(17),
     color: '#fff',
     fontWeight: 'bold',
     letterSpacing: 0.5,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity, SafeAreaView, ScrollView, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions, TouchableOpacity, SafeAreaView, ScrollView, Platform, StatusBar, KeyboardAvoidingView } from 'react-native';
 import { Text, TextInput, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +7,11 @@ import { loginUser } from '../../src/store/authSlice';
 import { RootState, AppDispatch } from '../../src/store';
 import { Ionicons } from '@expo/vector-icons';
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('screen');
+
+// Responsive scaling
+const scale = (size: number) => (width / 375) * size;
+const verticalScale = (size: number) => (height / 812) * size;
 
 export default function LoginScreen() {
   const theme = useTheme();
@@ -34,12 +38,23 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent} bounces={false} showsVerticalScrollIndicator={false}>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAvoidingView 
+          style={styles.container} 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <ScrollView 
+            contentContainerStyle={styles.scrollContent} 
+            bounces={false} 
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
         <View style={styles.modal}>
           {/* Close Button */}
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-            <Ionicons name="close" size={Math.round(width * 0.08)} color="#888" />
+            <Ionicons name="close" size={scale(24)} color="#888" />
           </TouchableOpacity>
           {/* Heading */}
           <Text style={styles.heading}>{'Login to\nyour Account'}</Text>
@@ -55,8 +70,10 @@ export default function LoginScreen() {
             mode="outlined"
             keyboardType="email-address"
             autoCapitalize="none"
+            autoComplete="email"
             style={styles.input}
             theme={theme}
+            contentStyle={styles.inputContent}
           />
           <TextInput
             label="Password"
@@ -64,8 +81,10 @@ export default function LoginScreen() {
             onChangeText={setPassword}
             mode="outlined"
             secureTextEntry
+            autoComplete="password"
             style={styles.input}
             theme={theme}
+            contentStyle={styles.inputContent}
           />
           {error && (
             <Text style={[styles.errorText, { color: theme.colors.error }]}>
@@ -86,8 +105,10 @@ export default function LoginScreen() {
             <Text style={styles.bottomLinkText}>Forgot Password?</Text>
           </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </>
   );
 }
 
@@ -96,104 +117,114 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  container: {
+    flex: 1,
+  },
   scrollContent: {
     flexGrow: 1,
     width: '100%',
     minHeight: height,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: scale(20),
+    paddingVertical: verticalScale(40),
   },
   modal: {
-    width: width * 0.88,
-    maxWidth: 420,
+    width: '100%',
+    maxWidth: scale(400),
     backgroundColor: '#fff',
-    borderRadius: 32,
-    paddingVertical: Math.max(32, Math.round(height * 0.06)),
-    paddingHorizontal: Math.max(20, Math.round(width * 0.07)),
+    borderRadius: scale(24),
+    paddingVertical: verticalScale(40),
+    paddingHorizontal: scale(24),
     alignItems: 'flex-start',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.10,
+    shadowOpacity: 0.15,
     shadowRadius: 16,
-    elevation: 8,
+    elevation: 10,
     position: 'relative',
   },
   closeButton: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? 24 : 16,
-    left: 24,
+    top: scale(20),
+    left: scale(20),
     zIndex: 2,
-    padding: 8,
+    padding: scale(8),
+    borderRadius: scale(20),
+    backgroundColor: 'rgba(0,0,0,0.05)',
   },
   heading: {
     fontFamily: 'Poppins_700Bold',
-    fontSize: Math.round(width * 0.08),
+    fontSize: scale(28),
     color: '#888',
     fontWeight: 'bold',
-    marginTop: 8,
-    marginBottom: 8,
+    marginTop: scale(40),
+    marginBottom: scale(8),
     marginLeft: 0,
     textAlign: 'left',
-    lineHeight: Math.round(width * 0.09),
+    lineHeight: scale(32),
   },
   topLinkRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: scale(32),
     marginLeft: 0,
   },
   topLinkText: {
     fontFamily: 'Poppins_400Regular',
-    fontSize: Math.round(width * 0.045),
+    fontSize: scale(14),
     color: '#888',
   },
   topLinkAction: {
     fontFamily: 'Poppins_600SemiBold',
-    fontSize: Math.round(width * 0.045),
+    fontSize: scale(14),
     color: '#00e6c3',
     textDecorationLine: 'underline',
   },
   input: {
     width: '100%',
-    marginBottom: 18,
+    marginBottom: scale(16),
+    backgroundColor: '#fff',
+  },
+  inputContent: {
     fontFamily: 'Poppins_400Regular',
-    fontSize: Math.round(width * 0.045),
-    borderRadius: 24,
+    fontSize: scale(16),
+    paddingHorizontal: scale(16),
   },
   errorText: {
-    fontSize: Math.round(width * 0.038),
-    marginBottom: 12,
+    fontSize: scale(12),
+    marginBottom: scale(12),
     textAlign: 'left',
     fontFamily: 'Poppins_400Regular',
   },
   loginButton: {
     width: '100%',
     backgroundColor: '#00e6c3',
-    borderRadius: 32,
-    paddingVertical: Math.max(14, Math.round(height * 0.022)),
+    borderRadius: scale(25),
+    paddingVertical: verticalScale(16),
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: scale(8),
     marginBottom: 0,
     shadowColor: '#00e6c3',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.10,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 5,
   },
   loginButtonText: {
     fontFamily: 'Poppins_700Bold',
-    fontSize: Math.round(width * 0.055),
+    fontSize: scale(18),
     color: '#fff',
     fontWeight: 'bold',
     letterSpacing: 0.5,
   },
   bottomLinkRow: {
-    marginTop: 32,
+    marginTop: scale(32),
     alignSelf: 'center',
   },
   bottomLinkText: {
     fontFamily: 'Poppins_400Regular',
-    fontSize: Math.round(width * 0.045),
+    fontSize: scale(14),
     color: '#888',
   },
 }); 
