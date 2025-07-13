@@ -4,6 +4,7 @@ import { Text } from 'react-native-paper';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import engine from '../../src/game/engine';
+import { Card } from '../../src/game/poker';
 
 const { width, height } = Dimensions.get('window');
 
