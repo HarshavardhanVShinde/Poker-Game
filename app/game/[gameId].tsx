@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity, StatusBar, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Dimensions, TouchableOpacity, StatusBar, SafeAreaView, Pressable } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import engine from '../../src/game/engine';
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,9 +14,26 @@ const verticalScale = (size: number) => (height / 812) * size;
 export default function GameScreen() {
   const { gameId } = useLocalSearchParams();
   const [cardsRevealed, setCardsRevealed] = useState(false);
+  const [gameState, setGameState] = useState(engine.getState());
 
-  const handleCardPress = () => {
-    setCardsRevealed(!cardsRevealed);
+  useEffect(() => {
+    const handleStateChange = (state: any) => {
+      setGameState(state);
+    };
+
+    engine.on('stateChanged', handleStateChange);
+
+    return () => {
+      engine.removeListener('stateChanged', handleStateChange);
+    };
+  }, []);
+
+  const handleCardPressIn = () => {
+    setCardsRevealed(true);
+  };
+
+  const handleCardPressOut = () => {
+    setCardsRevealed(false);
   };
 
   const handleMenuPress = () => {
@@ -25,6 +43,9 @@ export default function GameScreen() {
   const handleEmojiPress = () => {
     // Handle emoji press
   };
+
+  const player = gameState.players.find((p: any) => p.id === 'player');
+  const opponents = gameState.players.filter((p: any) => p.id !== 'player');
 
   return (
     <>
@@ -39,16 +60,17 @@ export default function GameScreen() {
           </View>
 
           {/* Opponent Player */}
-          <View style={styles.opponentContainer}>
-            <View style={styles.playerAvatar}>
-              <Text style={styles.dealerBadge}>D</Text>
-              <View style={styles.avatarCircle}>
-                <Text style={styles.avatarText}>👤</Text>
+          {opponents.map((opponent: any) => (
+            <View style={styles.opponentContainer} key={opponent.id}>
+              <View style={styles.playerAvatar}>
+                {gameState.dealer === opponent.id && <Text style={styles.dealerBadge}>D</Text>}
+                <View style={styles.avatarCircle}>
+                  <Text style={styles.avatarText}>👤</Text>
+                </View>
               </View>
+              <Text style={styles.playerName}>{opponent.name} ({opponent.chips})</Text>
             </View>
-            <Text style={styles.playerName}>Dosdepicas (480)</Text>
-            <Text style={styles.playerChips}>20</Text>
-          </View>
+          ))}
 
           {/* Center Area with Logo and Pot */}
           <View style={styles.centerArea}>
@@ -56,25 +78,25 @@ export default function GameScreen() {
               <Text style={styles.logoIcon}>🃏</Text>
               <Text style={styles.logoText}>EasyPoker</Text>
             </View>
-            <Text style={styles.potAmount}>10</Text>
+            <Text style={styles.potAmount}>{gameState.pot}</Text>
           </View>
 
           {/* Player Cards */}
-          <TouchableOpacity 
-            style={styles.cardsContainer} 
-            onPress={handleCardPress}
-            activeOpacity={0.9}
+          <Pressable
+            style={styles.cardsContainer}
+            onPressIn={handleCardPressIn}
+            onPressOut={handleCardPressOut}
           >
             <View style={styles.cardPair}>
               {cardsRevealed ? (
                 <>
                   <View style={[styles.card, styles.cardLeft]}>
-                    <Text style={styles.cardValue}>3</Text>
-                    <Text style={styles.cardSuit}>♦</Text>
+                    <Text style={styles.cardValue}>{player.hand[0].rank}</Text>
+                    <Text style={styles.cardSuit}>{player.hand[0].suit}</Text>
                   </View>
                   <View style={[styles.card, styles.cardRight]}>
-                    <Text style={styles.cardValue}>10</Text>
-                    <Text style={styles.cardSuit}>♣</Text>
+                    <Text style={styles.cardValue}>{player.hand[1].rank}</Text>
+                    <Text style={styles.cardSuit}>{player.hand[1].suit}</Text>
                   </View>
                 </>
               ) : (
@@ -84,11 +106,11 @@ export default function GameScreen() {
                 </>
               )}
             </View>
-          </TouchableOpacity>
+          </Pressable>
 
           {/* Player Info */}
           <View style={styles.playerContainer}>
-            <Text style={styles.playerName}>PokerFace (490)</Text>
+            <Text style={styles.playerName}>{player.name} ({player.chips})</Text>
             <TouchableOpacity style={styles.emojiButton} onPress={handleEmojiPress}>
               <Text style={styles.emojiIcon}>😊</Text>
             </TouchableOpacity>
@@ -96,19 +118,16 @@ export default function GameScreen() {
 
           {/* Action Buttons */}
           <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={() => engine.fold(player.id)}>
               <Text style={styles.actionButtonText}>Fold</Text>
-              <Text style={styles.actionButtonValue}>41</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={() => engine.call(player.id)}>
               <Text style={styles.actionButtonText}>Call</Text>
-              <Text style={styles.actionButtonValue}>10</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={() => engine.raise(player.id, 20)}>
               <Text style={styles.actionButtonText}>Raise</Text>
-              <Text style={styles.actionButtonValue}>40</Text>
             </TouchableOpacity>
           </View>
         </View>
