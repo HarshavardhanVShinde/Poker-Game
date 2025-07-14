@@ -1,5 +1,4 @@
 import { Deck, Card } from './poker';
-import { EventEmitter } from 'events';
 
 class Player {
   public hand: Card[] = [];
@@ -9,13 +8,33 @@ class Player {
   constructor(public id: string, public name: string, public chips: number) {}
 }
 
-class GameEngine extends EventEmitter {
+class GameEngine {
+  private events: { [key: string]: Function[] } = {};
   public players: Player[] = [];
   public communityCards: Card[] = [];
   public pot = 0;
   public activePlayerIndex = 0;
   public dealer = 0;
   private deck = new Deck();
+
+  on(event: string, listener: Function) {
+    if (!this.events[event]) {
+      this.events[event] = [];
+    }
+    this.events[event].push(listener);
+  }
+
+  removeListener(event: string, listener: Function) {
+    if (this.events[event]) {
+      this.events[event] = this.events[event].filter((l) => l !== listener);
+    }
+  }
+
+  emit(event: string, ...args: any[]) {
+    if (this.events[event]) {
+      this.events[event].forEach((listener) => listener(...args));
+    }
+  }
 
   addPlayer(player: { id: string; name: string; chips: number }) {
     this.players.push(new Player(player.id, player.name, player.chips));
